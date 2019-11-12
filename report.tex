@@ -1,0 +1,784 @@
+\documentclass[a4paper, 11pt]{article} % A4 paper size, default 11pt font size and oneside for equal margins
+
+\usepackage{listings}
+\usepackage{color}
+
+\newcommand{\plogo}{\fbox{$\mathcal{PL}$}} % Generic dummy publisher logo
+
+\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[T1]{fontenc} % Output font encoding for international characters
+\usepackage{fouriernc} % Use the New Century Schoolbook font
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color
+  basicstyle=\footnotesize,        % size of fonts used for the code
+  breaklines=true,                 % automatic line breaking only at whitespace
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  keywordstyle=\color{blue},       % keyword style
+  stringstyle=\color{mymauve},     % string literal style
+}
+
+\begin{document}
+
+\begin{titlepage} % Suppresses headers and footers on the title page
+
+	\centering % Centre everything on the title page
+	
+	\scshape % Use small caps for all text on the title page
+	
+	\vspace*{\baselineskip} % White space at the top of the page
+	
+	%------------------------------------------------
+	%	Title
+	%------------------------------------------------
+	
+	\rule{\textwidth}{1.6pt}\vspace*{-\baselineskip}\vspace*{2pt} % Thick horizontal rule
+	\rule{\textwidth}{0.4pt} % Thin horizontal rule
+	
+	\vspace{0.75\baselineskip} % Whitespace above the title
+	
+	{\LARGE COMP2208 Assignment} % Title
+	\vspace{5 mm}\\
+	{\LARGE Search Methods}
+	
+	\vspace{0.75\baselineskip} % Whitespace below the title
+	
+	\rule{\textwidth}{0.4pt}\vspace*{-\baselineskip}\vspace{3.2pt} % Thin horizontal rule
+	\rule{\textwidth}{1.6pt} % Thick horizontal rule
+	
+	\vspace{2\baselineskip} % Whitespace after the title block
+
+	
+	AI Coursework Assignment: Blocksworld tile puzzle % Subtitle or further description
+	
+	\vspace*{3\baselineskip} % Whitespace under the subtitle
+	
+	\vspace{0.5\baselineskip} % Whitespace before the editors
+	
+	{\scshape\Large Georgios Alexiou} % Editor list
+	
+	\vspace{0.5\baselineskip} % Whitespace below the editor list
+	
+	\textit{University of Southampton} % Editor affiliation
+	
+	\vfill % Whitespace between editor names and publisher logo
+	
+	\vspace{0.3\baselineskip} % Whitespace under the publisher logo
+	
+	November 2019 % Publication year
+	
+	{\large Department of Electronics and Computer Science} % Publisher
+
+\end{titlepage}
+
+\section{Approach}
+
+\section{Evidence}
+
+\section{Scalability Study}
+
+\section{Extras and limitations}
+
+\section{References}
+
+\section{Code}
+
+
+
+\subsection{Search Methods Package}
+
+\subsection{Basic Package}
+
+\subsubsection{Move Class}
+\begin{lstlisting}[language=java]
+package Basic;
+
+/**
+ * Enum representing the types of moves that a block can make inside a grid.
+ * The block can move up, down, left and right.
+ */
+public enum Move {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT
+}
+\end{lstlisting}
+\subsubsection{Block Class}
+\begin{lstlisting}[language=java]
+package Basic;
+
+import java.util.Objects;
+
+/**
+ * A class representing a Block in a Blocksworld grid. it has the necessary parameters to represent the positions
+ * of Blocks in the grid as well as the name of the block.
+ */
+public class Block {
+    //characteristics of block name and coordinates
+    private char name;
+    private int y;
+    private int x;
+
+    /**
+     * Constructor of the Block class that takes the name as well as coordinates of a block
+     *
+     * @param name character representing the name of the class
+     * @param x horizontal (x) coordinate of block
+     * @param y vertical (y) coordinate of block
+     */
+    public Block(char name, int x, int y) {
+        this.name = name;
+        this.y = y;
+        this.x = x;
+    }
+
+    public char getName() {
+        return name;
+    }
+
+    //set method for the name of the block
+    public void setName(char name) { this.name = name; }
+
+    //get method for the y coordinate of the block
+    public int getyPosition() { return y; }
+
+    //set method of the y coordinate of the block
+    public void setyPosition(int yPos) { this.y = yPos; }
+
+    //get method for the x coordinate of the block
+    public int getxPosition() { return x; }
+
+    //set method for the x coordinate of the block
+    public void setxPosition(int xPos) { this.x = xPos; }
+
+    //returns the position of the block
+    public String getPosition(){ return getxPosition() + " " + getyPosition(); }
+
+    //generated automatically using IntelliJ
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Block block = (Block) o;
+        return y == block.y &&
+                x == block.x;
+    }
+
+    //generated automatically using IntelliJ
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, y, x);
+    }
+}
+
+\end{lstlisting}
+\subsubsection{State Class}
+\begin{lstlisting}[language=java]
+package Basic;
+
+import java.util.Arrays;
+import java.util.Objects;
+
+/**
+ * The State class represents the state in the Blocksworld Puzzle meaning that it holds the positions of all the blocks a,b,c as well as the agent.
+ * The class contains the necessary parameters to represents the puzzle grid as well as methods that allow the agent to move or check whether a mvoe
+ * can be performed.
+ */
+public class State {
+
+    //grid is a 2D array representing the positions of the block and the agent
+    private Block[][] grid;
+    private int gridSize;
+    private int arraySize;
+
+    //Stores information for a, b, c, agent blocks
+    private Block a, b, c, agent;
+
+    /*
+        @param blockPositions: int[] will be a 1D array where the first two elements will be the
+                                     x and y positions of a, then b, then c, then agent
+     */
+
+    /**
+     * Constructor for Block class that takes the positions of blocks, gridSize and throws an Exception
+     *
+     * @param blockPositions 1D array where the first two elements will be the x and y positions of a,
+     *                       then b, then c, then agent
+     * @param gridSize world size of the 2d array (array is going to be of size gridSize * gridSize)
+     * @throws Exception exception is thrown when blocks a,b,c,agent overlap (IllegalArgumentException)
+     */
+    public State(int[] blockPositions, int gridSize) throws Exception{
+
+        this.gridSize = gridSize;
+        this.arraySize = gridSize - 1;
+
+        //throw exception if a position is greater than the gridSize
+        for (int position: blockPositions){
+            if (position > arraySize || position < 0)
+                throw new IllegalArgumentException("Error: one or more of the parameters you entered is not within the range 0 and " + arraySize + "." );
+        }
+
+        this.a = new Block('A', blockPositions[0], blockPositions[1]);
+        this.b = new Block('B', blockPositions[2], blockPositions[3]);
+        this.c = new Block('C', blockPositions[4], blockPositions[5]);
+        this.agent = new Block('P', blockPositions[6], blockPositions[7]);
+
+        //checks if the blocks are in the same positions
+        if(a.equals(b) || a.equals(c) || b.equals(c))
+            throw new IllegalArgumentException("Error: Each block should have a different position within the grid.");
+
+        //checks if the blocks are in the same positions as the agent
+        else if(agent.equals(a) || agent.equals(b) || agent.equals(c))
+            throw new IllegalArgumentException("Error: The blocks and the agent should be at different positions");
+
+        //since everything is correct, we add the blocks to the grid
+        else{
+            grid = new Block[this.gridSize][this.gridSize];
+
+            //set all positions as empty
+            for (int xPos=0; xPos<gridSize; xPos++)
+                for (int yPos=0; yPos<gridSize; yPos++)
+                    setPosition('x', xPos, yPos);
+
+            //set a,b,c,agent positions
+            setPosition(a);
+            setPosition(b);
+            setPosition(c);
+            setPosition(agent);
+
+        }
+    }
+
+    /**
+     * Method that sets position of a block if it doesn't exist in the grid
+     *
+     * @param name name of block
+     * @param xPos x coordinate of block
+     * @param yPos y coordinate of block
+     */
+    public void setPosition(char name, int xPos, int yPos){
+        Block newBlock = new Block (name, xPos, yPos);
+        grid[yPos][xPos] = newBlock;
+
+        //if block is a,b,c we update the Blocks a,b,c
+        if(name == 'a')
+            a = newBlock;
+
+        else if (name == 'b')
+            b = newBlock;
+
+        else if(name == 'c')
+            c = newBlock;
+    }
+
+
+    /**
+     * Method that sets position of a block if it already exists in the grid
+     *
+     * @param block takes the block coordinates and adds it to the grid
+     */
+    public void setPosition(Block block){ grid[block.getyPosition()][block.getxPosition()] = block; }
+
+    /**
+     * Method that checks if the current state is equal to another state including the agent
+     *
+     * @param s state that we will compare to
+     * @return true if the blocks a,b,c,agent are equal
+     *         false if the blocks a,b,c,agent are not equal
+     */
+    public boolean isEqualFixedAgent(State s){
+        return this.a.equals(s.a) && b.equals(s.b) && b.equals(s.b) && c.equals(s.c) && agent.equals(s.agent);
+    }
+
+    /**
+     * Method that checks if the current state is equal to another state excluding the agent
+     *
+     * @param s state that we will compare to
+     * @return true if the blocks a,b,c are equal
+     *         false if the blocks a,b,c are not equal
+     */
+    public boolean isEqualNoAgent(State s){
+        return this.a.equals(s.a) && b.equals(s.b) && b.equals(s.b) && c.equals(s.c);
+    }
+
+    /**
+     * Method that locates the blocks on the grid given x/y coordinates
+     *
+     * @param x X coordinate of block
+     * @param y Y coordinate of block
+     * @return
+     */
+    public Block locateBlock (int x, int y){
+        return grid[y][x];
+    }
+
+    /**
+     * Method that takes a type of Move and moves the agent depending on the type of move after checking
+     * that the agent is not blocked.
+     *
+     * @param move takes enum Move that shows the type of move we want to perform
+     * @return true if the move is made
+     *         false if the move is blocked
+     */
+    public boolean makeMove (Move move){
+        Block toReplace = null;
+
+        if(isBlocked(move)){
+            System.out.println("move blocked");
+            return false;
+        }
+
+        else {
+            switch (move) {
+                case UP:
+                    toReplace = locateBlock(agent.getxPosition(), agent.getyPosition() - 1);
+
+                    //placed agent in new position
+                    agent.setyPosition(agent.getyPosition() - 1);
+                    setPosition(agent);
+
+                    //placed other block in agent's previous position
+                    setPosition(toReplace.getName(), toReplace.getxPosition(), toReplace.getyPosition() + 1);
+
+
+                    break;
+
+                case DOWN:
+
+                    toReplace = locateBlock(agent.getxPosition(), agent.getyPosition() + 1);
+
+                    //placed agent in new position
+                    agent.setyPosition(agent.getyPosition() + 1);
+                    setPosition(agent);
+
+                    //placed other block in agent's previous position
+                    setPosition(toReplace.getName(), toReplace.getxPosition(), toReplace.getyPosition() - 1);
+
+                    break;
+
+                case LEFT:
+                    toReplace = locateBlock(agent.getxPosition() - 1, agent.getyPosition());
+
+                    //placed agent in new position
+                    agent.setxPosition(agent.getxPosition() - 1);
+                    setPosition(agent);
+
+                    //placed other block in agent's previous position
+                    setPosition(toReplace.getName(), toReplace.getxPosition() + 1, toReplace.getyPosition());
+
+                    break;
+
+                case RIGHT:
+                    toReplace = locateBlock(agent.getxPosition() + 1, agent.getyPosition());
+
+                    //placed agent in new position
+                    agent.setxPosition(agent.getxPosition() + 1);
+                    setPosition(agent);
+
+                    //placed other block in agent's previous position
+                    setPosition(toReplace.getName(), toReplace.getxPosition() - 1, toReplace.getyPosition());
+
+                    break;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks whether the move is blocked and returns the appropreate boolean
+     *
+     * @param move Move enum that shows the type of move that the agent wants to perform
+     * @return true if the move is blocked
+     *         false if the move is not blocked
+     */
+    public boolean isBlocked(Move move){
+        switch(move){
+            case UP:
+                if(agent.getyPosition() == 0)
+                    return true;
+                break;
+
+            case DOWN:
+                if(agent.getyPosition() == arraySize)
+                    return true;
+                break;
+
+            case LEFT:
+                if(agent.getxPosition() == 0)
+                    return true;
+                break;
+
+            case RIGHT:
+                if(agent.getxPosition() == arraySize)
+                    return true;
+                break;
+
+            default:
+                break;
+        }
+
+        return false;
+    }
+
+    /**
+     * Method that returns a string containing the block positions as well as grid
+     *
+     * @return string of the grid as well as block positions
+     */
+    public String toString() {
+
+        String gridString = "";
+        for (int i=0; i<gridSize; i++){
+            for (int j=0; j<gridSize; j++){
+                if (j != arraySize)
+                    gridString = gridString + " " + grid[i][j].getName();
+                else
+                    gridString = gridString + " " + grid[i][j].getName() + "\n";
+            }
+        }
+
+        String blockPositions = "The positions of each block is shown below: \n" +
+                                "    A -> x: " + this.a.getxPosition() + " y: " + this.a.getyPosition() + "\n" +
+                                "    B -> x: " + this.b.getxPosition() + " y: " + this.a.getyPosition() + "\n" +
+                                "    C -> x: " + this.c.getxPosition() + " y: " + this.a.getyPosition() + "\n" +
+                                "    Agent -> x: " + this.agent.getxPosition() + " y: " + this.agent.getyPosition();
+
+        return gridString + "\n\n" + blockPositions;
+    }
+
+    //get method for block A
+    public Block getA() { return a; }
+
+    //get method for block B
+    public Block getB() { return b; }
+
+    //get method for block C
+    public Block getC() { return c; }
+
+    //get method for agent block (P)
+    public Block getAgent() { return agent; }
+
+    //get method for gridSize
+    public int getGridSize() { return gridSize; }
+
+    //get method for arraySize
+    public int getArraySize() { return arraySize; }
+
+    //generated automatically using IntelliJ
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        State state = (State) o;
+        return gridSize == state.gridSize &&
+                arraySize == state.arraySize &&
+                Arrays.equals(grid, state.grid) &&
+                Objects.equals(a, state.a) &&
+                Objects.equals(b, state.b) &&
+                Objects.equals(c, state.c) &&
+                Objects.equals(agent, state.agent);
+    }
+
+    //generated automatically using IntelliJ
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(gridSize, arraySize, a, b, c, agent);
+        result = 31 * result + Arrays.hashCode(grid);
+        return result;
+    }
+}
+
+\end{lstlisting}
+\subsubsection{Node Class}
+\begin{lstlisting}[language=java]
+package Basic;
+
+import java.util.ArrayList;
+import java.util.Objects;
+
+/**
+ * The Node Class is used to represent nodes in a search tree when running the different algorithms.
+ * The class contains a state, meaning the state of the puzzle, a parent meaning the previous node,
+ * the path cost to this node, the depth of the node in the search tree, the previous move taken and
+ * the heuristic cost to the end node.
+ */
+public class Node implements Comparable{
+
+    //characteristics of a Node
+    private State state;
+    private Node parent;
+    private int pathCost;
+    private int depth;
+
+    private Move previousMove; //move taken from parent Node to current Node
+    private int heuristic; //heuristic cost to final node
+
+
+    /**
+     * Constructor for class Node that is the root of the search tree
+     *
+     * @param state the current state of the puzzle
+     */
+    public Node(State state) {
+        this.state = state;
+        this.depth = 0;
+        this.pathCost = 0;
+    }
+
+    /**
+     * Constructor for the class Node that isn't the root of the tree (has parent node)
+     *
+     * @param state the current state of the puzzle
+     * @param previousMove the move made from the parent Node to current Node
+     * @param parent the parent node of the current node
+     */
+    public Node(State state, Move previousMove, Node parent) {
+        this.state = state;
+        this.parent = parent;
+        this.previousMove = previousMove;
+
+        if(parent != null) {
+            this.pathCost = parent.pathCost + 2;
+            this.depth = parent.depth + 1;
+        }
+    }
+
+    //method that returns whether the Node is the root of the search tree
+    private boolean isRoot(){ return this.parent == null; }
+
+    //get method that returns the state
+    public State getState() { return state; }
+
+    //get method that returns parent Node
+    public Node getParent() { return parent; }
+
+    //get method that returns the pathCost
+    public int getPathCost() { return pathCost; }
+
+    //get method that returns the depth of the node
+    public int getDepth() { return depth; }
+
+    //get method that returns the previous move made from parent to current Node
+    public Move getPreviousMove() { return previousMove; }
+
+    /**
+     * Method that calculates the heuristic cost from the current Node (this) to a target node.
+     * The heuristic cost is calculated by adding the distances from each block of this Node to the target Node.
+     * We also add the depth of the current Node.
+     *
+     * @param node target node to calculate heuristic to
+     */
+    public void calculateHeuristicEstimate(Node node) {
+
+        int heuristic = 0;
+
+        //adding the distances for blocks of this Node to target Node
+        heuristic += node.getState().getA().getxPosition() - getState().getA().getxPosition();
+        heuristic += node.getState().getA().getyPosition() - getState().getA().getyPosition();
+        heuristic += node.getState().getB().getxPosition() - getState().getB().getxPosition();
+        heuristic += node.getState().getB().getyPosition() - getState().getB().getyPosition();
+        heuristic += node.getState().getC().getxPosition() - getState().getC().getxPosition();
+        heuristic += node.getState().getC().getyPosition() - getState().getC().getyPosition();
+
+        //adding current node depth to heuristic
+        heuristic += getDepth();
+
+        this.heuristic = heuristic;
+    }
+
+    /**
+     * Method that returns an ArrayList of characters representing the moves made from the root to the current Node.
+     *
+     * @return ArrayList<Character> of all moves made to reach solutions
+     */
+    public ArrayList<Character> displayPathTaken(){
+
+        ArrayList<Character> path = new ArrayList<Character>();
+        Node current = this;
+        path.add(convertMoveToChar(current.getPreviousMove()));
+
+        while (current.getParent() != null){
+            this.depth = parent.getDepth() + 1;
+            path.add(convertMoveToChar(current.getPreviousMove()));
+        }
+
+        return path;
+    }
+
+    /**
+     * Method that converts a move enum to a character for use in the displayPathTaken() method.
+     * The conversions are as follows:
+     *     Move.UP = 'U'
+     *     Move.DOWN = 'D'
+     *     Move.LEFT = 'L'
+     *     Move.RIGHT = 'R'
+     *
+     * @param move Move enum used to understand what to return
+     * @return character representing the move input to the method
+     *
+     */
+    public char convertMoveToChar(Move move){
+        switch(move){
+            case UP:
+                return 'U';
+
+            case DOWN:
+                return 'D';
+
+            case LEFT:
+                return 'L';
+
+            case RIGHT:
+                return 'R';
+        }
+
+        return 'x';
+    }
+
+    /**
+     * Method that generates and ArrayList that contains the possible moves that can be made from the current Node
+     * If the move is possible (using isBlocked from the State class), then a node is generated and added to the ArrayList.
+     *
+     * @return ArrayList<Node> that represents the moves that can be made from the current Node
+     */
+    public ArrayList<Node> getPossibleMoves(){
+
+        ArrayList<Node> possibleMoves = new ArrayList<>();
+
+        try {
+
+            if (!state.isBlocked(Move.UP)) {
+                Node upNode = new Node(state, Move.UP, this);
+                upNode.state.makeMove(Move.UP);
+                possibleMoves.add(upNode);
+            }
+
+            if (!state.isBlocked(Move.DOWN)) {
+                Node downNode = new Node(state, Move.DOWN, this);
+                downNode.state.makeMove(Move.UP);
+                possibleMoves.add(downNode);
+            }
+
+            if (!state.isBlocked(Move.LEFT)) {
+                Node leftNode = new Node(state, Move.LEFT, this);
+                leftNode.state.makeMove((Move.LEFT));
+                possibleMoves.add(leftNode);
+            }
+
+            if (!state.isBlocked((Move.RIGHT))) {
+                Node rightNode = new Node(state, Move.RIGHT, this);
+                rightNode.state.makeMove((Move.RIGHT));
+                possibleMoves.add(rightNode);
+            }
+
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+
+        return possibleMoves;
+    }
+
+
+    /**
+     * We use the compareTo method from the Comparable interface implemented in the beggining of the class. This is done
+     * to help us compare the current Node with a different Node. We compare the nodes in terms of their heuristic cost.
+     *
+     * @param o we compare our current node to this node (we convert it from Object to Node)
+     * @return -1 if the current node has a smaller heuristic cost
+     *         0 if the current node has the same heuristic cost
+     *         1 if the current node has a greater heuristic cost
+     */
+    @Override
+    public int compareTo(Object o){
+        Node node = (Node) o;
+
+        if (heuristic == node.heuristic) return 0;
+        else if (heuristic > node.heuristic) return 1;
+        else return -1;
+    }
+
+    //generated automatically using IntelliJ
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Node node = (Node) o;
+        return Objects.equals(state, node.state);
+    }
+
+    //generated automatically using IntelliJ
+    @Override
+    public int hashCode() {
+        return Objects.hash(state);
+    }
+}
+
+\end{lstlisting}
+\subsubsection{Test Class}
+\begin{lstlisting}[language=java]
+package Basic;
+
+import java.io.File;
+import java.io.PrintStream;
+
+public class Test {
+
+    public static void main(String[] args){
+        try {
+
+            State s1 = new State(new int[]{1,1,1,2,1,3,2,2}, 4);
+            System.out.println(s1.toString() + "\n\n");
+            State s2 = new State(new int[]{1,1,1,2,1,3,2,1}, 4);
+            System.out.println(s1.toString() + "\n\n");
+            State s3 = new State(new int[]{1,1,1,2,1,3,2,2}, 4);
+            System.out.println(s2.toString() + "\n\n");
+
+            System.out.println("Is s1 = s2: " + s1.equals(s2));
+            System.out.println("Is s1 = s2: " + s1.equals(s3));
+            System.out.println("Is s2 = s3: " + s1.equals(s3) + "\n");
+
+            System.out.println("Move up");
+            s1.makeMove(Move.UP);
+            System.out.println(s1.toString() + "\n");
+
+            System.out.println("Move left");
+            s1.makeMove(Move.LEFT);
+            System.out.println(s1.toString() + "\n");
+
+            System.out.println("Move down");
+            s1.makeMove(Move.DOWN);
+            System.out.println(s1.toString() + "\n");
+
+            System.out.println("Move down");
+            s1.makeMove(Move.DOWN);
+            System.out.println(s1.toString() + "\n");
+
+            System.out.println("Move right");
+            s1.makeMove(Move.RIGHT);
+            System.out.println(s1.toString() + "\n");
+
+            System.out.println("Move right");
+            s1.makeMove(Move.RIGHT);
+            System.out.println(s1.toString() + "\n\n");
+
+            System.out.println("Move down");
+            s1.makeMove(Move.DOWN);
+            System.out.println(s1.toString() + "\n");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+}
+
+\end{lstlisting}
+\end{document}
