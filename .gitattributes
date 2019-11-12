@@ -1,2 +1,2 @@
-linguist-vendored
-.tex linguist-vendored
+
+*.tex linguist-language=Java
