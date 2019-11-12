@@ -2,44 +2,50 @@ package Basic;
 
 import java.util.Objects;
 
+/**
+ * A class representing a Block in a Blocksworld grid. it has the necessary parameters to represent the positions
+ * of Blocks in the grid as well as the name of the block.
+ */
 public class Block {
+    //characteristics of block name and coordinates
     private char name;
-    private int yPos;
-    private int xPos;
+    private int y;
+    private int x;
 
-    public Block(char name, int yPos, int xPos) {
+    /**
+     * Constructor of the Block class that takes the name as well as coordinates of a block
+     *
+     * @param name character representing the name of the class
+     * @param x horizontal (x) coordinate of block
+     * @param y vertical (y) coordinate of block
+     */
+    public Block(char name, int x, int y) {
         this.name = name;
-        this.yPos = yPos;
-        this.xPos = xPos;
+        this.y = y;
+        this.x = x;
     }
 
     public char getName() {
         return name;
     }
 
-    public void setName(char name) {
-        this.name = name;
-    }
+    //set method for the name of the block
+    public void setName(char name) { this.name = name; }
 
-    public int getyPos() {
-        return yPos;
-    }
+    //get method for the y coordinate of the block
+    public int getyPosition() { return y; }
 
-    public void setyPos(int yPos) {
-        this.yPos = yPos;
-    }
+    //set method of the y coordinate of the block
+    public void setyPosition(int yPos) { this.y = yPos; }
 
-    public int getxPos() {
-        return xPos;
-    }
+    //get method for the x coordinate of the block
+    public int getxPosition() { return x; }
 
-    public void setxPos(int xPos) {
-        this.xPos = xPos;
-    }
+    //set method for the x coordinate of the block
+    public void setxPosition(int xPos) { this.x = xPos; }
 
-    public String getPosition(){
-        return getxPos() + " " + getyPos();
-    }
+    //returns the position of the block
+    public String getPosition(){ return getxPosition() + " " + getyPosition(); }
 
     //generated automatically using IntelliJ
     @Override
@@ -47,13 +53,13 @@ public class Block {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Block block = (Block) o;
-        return yPos == block.yPos &&
-                xPos == block.xPos;
+        return y == block.y &&
+                x == block.x;
     }
 
     //generated automatically using IntelliJ
     @Override
     public int hashCode() {
-        return Objects.hash(name, yPos, xPos);
+        return Objects.hash(name, y, x);
     }
 }
