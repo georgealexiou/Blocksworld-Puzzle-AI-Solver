@@ -163,8 +163,6 @@ public class State {
 
                     //placed other block in agent's previous position
                     setPosition(toReplace.getName(), toReplace.getxPosition(), toReplace.getyPosition() + 1);
-
-
                     break;
 
                 case DOWN:
@@ -177,7 +175,6 @@ public class State {
 
                     //placed other block in agent's previous position
                     setPosition(toReplace.getName(), toReplace.getxPosition(), toReplace.getyPosition() - 1);
-
                     break;
 
                 case LEFT:
@@ -189,7 +186,6 @@ public class State {
 
                     //placed other block in agent's previous position
                     setPosition(toReplace.getName(), toReplace.getxPosition() + 1, toReplace.getyPosition());
-
                     break;
 
                 case RIGHT:
@@ -201,7 +197,6 @@ public class State {
 
                     //placed other block in agent's previous position
                     setPosition(toReplace.getName(), toReplace.getxPosition() - 1, toReplace.getyPosition());
-
                     break;
             }
         }
@@ -289,6 +284,14 @@ public class State {
     //get method for arraySize
     public int getArraySize() { return arraySize; }
 
+    public int[] getPositions() {
+        int[] positions = {a.getxPosition(), a.getyPosition(),
+                           b.getxPosition(), b.getyPosition(),
+                           c.getxPosition(), c.getyPosition(),
+                           agent.getxPosition(), agent.getyPosition()};
+
+        return positions;
+    }
     //generated automatically using IntelliJ
     @Override
     public boolean equals(Object o) {

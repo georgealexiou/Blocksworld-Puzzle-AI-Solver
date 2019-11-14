@@ -48,6 +48,8 @@ public class Node implements Comparable{
             this.pathCost = parent.pathCost + 2;
             this.depth = parent.depth + 1;
         }
+
+        state.makeMove(previousMove);
     }
 
     //method that returns whether the Node is the root of the search tree
@@ -75,7 +77,7 @@ public class Node implements Comparable{
      *
      * @param node target node to calculate heuristic to
      */
-    public void calculateHeuristicEstimate(Node node) {
+    public int calculateHeuristicEstimate(Node node) {
 
         int heuristic = 0;
 
@@ -91,6 +93,8 @@ public class Node implements Comparable{
         heuristic += getDepth();
 
         this.heuristic = heuristic;
+
+        return heuristic;
     }
 
     /**
@@ -155,26 +159,26 @@ public class Node implements Comparable{
         try {
 
             if (!state.isBlocked(Move.UP)) {
-                Node upNode = new Node(state, Move.UP, this);
-                upNode.state.makeMove(Move.UP);
+                System.out.println("U");
+                Node upNode = new Node(new State(state.getPositions(), 4), Move.UP, this);
                 possibleMoves.add(upNode);
             }
 
             if (!state.isBlocked(Move.DOWN)) {
-                Node downNode = new Node(state, Move.DOWN, this);
-                downNode.state.makeMove(Move.UP);
+                System.out.println("D");
+                Node downNode = new Node(new State(state.getPositions(), 4), Move.DOWN, this);
                 possibleMoves.add(downNode);
             }
 
             if (!state.isBlocked(Move.LEFT)) {
-                Node leftNode = new Node(state, Move.LEFT, this);
-                leftNode.state.makeMove((Move.LEFT));
+                System.out.println("L");
+                Node leftNode = new Node(new State(state.getPositions(), 4), Move.LEFT, this);
                 possibleMoves.add(leftNode);
             }
 
             if (!state.isBlocked((Move.RIGHT))) {
-                Node rightNode = new Node(state, Move.RIGHT, this);
-                rightNode.state.makeMove((Move.RIGHT));
+                System.out.println("R");
+                Node rightNode = new Node(new State(state.getPositions(), 4), Move.RIGHT, this);
                 possibleMoves.add(rightNode);
             }
 
@@ -184,7 +188,6 @@ public class Node implements Comparable{
 
         return possibleMoves;
     }
-
 
     /**
      * We use the compareTo method from the Comparable interface implemented in the beggining of the class. This is done
