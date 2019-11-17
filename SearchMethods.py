@@ -17,25 +17,28 @@ class SearchMethods:
 		path = []
 		startTime = timeit.timeit()
 
-		#initialize queue and add Start Node to it
+		#initialize queue and dictionary and add Start Node to it
 		q = queue.Queue()
 		q.put(self.startNode)
+
+		visited = {self.startNode: True}
 
 		while not q.empty():
 			#pops first element from the queue and checks what moves can be made
 			currentNode = q.get()
+			currentNode.state.printGrid()
 			possibleMoves = currentNode.checkPossibleMoves()
 
 			if(currentNode.state.isEqual(self.finishState)):
-				print 'I am equal'
 				time = timeit.timeit() - startTime
-				self.printResults('Breadth First', currentNode, time)
+				self.printResults('Breadth First', currentNode, visited, time)
 				quit();
 
 			else:
 				for nextNode in possibleMoves:
 					if possibleMoves != None:
 						q.put(nextNode)
+						visited[nextNode] = True
 
 	def DFS(self):
 		return 0
@@ -46,15 +49,15 @@ class SearchMethods:
 	def aStar(self):
 		return 0
 
-	def printResults(self, searchType, currentNode, time):
-		print '{} Search Complete'.format(searchType)
+	def printResults(self, searchType, currentNode, visited, time):
+		print ('{} Search Complete'.format(searchType))
 		
-		print 'Start State:'
+		print ('Start State:')
 		self.startNode.state.printGrid()
-		print '\nFinal State:'
+		print ('\nFinal State:')
 		currentNode.state.printGrid()
 
-		#print"\nDepth: {}\nPath Cost: {}\nMoves Performed: {}\nTime Taken: {}".format(currentNode.depth, currentNode.pathCost, currentNode.getPath(), time)
+		print ('\nDepth: {}\nHeuristic Estimate: {}\nMoves Performed: {}\nAmount visited: {}\nTime Taken: {}'.format(currentNode.depth, self.startNode.getHeuristicEstimate(currentNode), currentNode.getPath(), len(visited), time))
 
 a = Block('A', 0, 0)
 b = Block('B', 1, 0)
@@ -63,9 +66,9 @@ agent = Block('P', 3, 0)
 state = State(a, b, c, agent)
 node = Node(state, None, None)
 
-agent1 = Block('P', 2, 0)
-a1 = Block('A', 0, 0)
-b1 = Block('B', 1, 0)
+agent1 = Block('P', 3, 3)
+a1 = Block('A', 1, 0)
+b1 = Block('B', 2, 0)
 c1 = Block('C', 3, 0)
 
 sm = SearchMethods(node, State(a1, b1, c1, agent1))

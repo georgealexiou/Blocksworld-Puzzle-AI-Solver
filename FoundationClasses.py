@@ -1,5 +1,3 @@
-import numpy as numpy
-
 class Block:
 
 	def __init__ (self, name, x, y):
@@ -8,7 +6,11 @@ class Block:
 		self.y = y
 
 	def isEqual(self, block):
-		return self.x == block.x and self.y == block.y
+		if self.x == block.x and self.y == block.y:
+			return True
+			print ('Hello')
+		else:
+			return False
 
 	def toString(self):
 		return self.name + ': x:' + self.x + ', y:' + self.y
@@ -27,11 +29,12 @@ class State:
 
 	def isEqual(self, state):
 		#checks if the positions of the blocks are the same and returns true
+
+		#print ('a: {} {}, {} {}'.format(state.a.x, state.a.y, self.a.x, self.a.y))
+		#print ('b: {} {}, {} {}'.format(state.b.x, state.b.y, self.a.x, self.b.y))
+		#print ('c: {} {}, {} {}'.format(state.c.x, state.c.y, self.a.x, self.c.y))
 		if self.a.isEqual(state.a) and self.b.isEqual(state.b) and self.c.isEqual(state.c):
-			print 'a: {} {}, {} {}'.format(state.a.x, state.a.y, self.a.x, self.a.y)
-			print 'b: {} {}, {} {}'.format(state.b.x, state.b.y, self.a.x, self.b.y)
-			print 'c: {} {}, {} {}'.format(state.c.x, state.c.y, self.a.x, self.c.y)
-		   	return True
+			return True
 
 		#otherwise it returns false
 		else:
@@ -46,9 +49,9 @@ class State:
 		grid[3 - self.agent.y][self.agent.x] = self.agent.name
 
 		for y in range(0, 4):
-			print '{} {} {} {}'.format(grid[y][0], grid[y][1], grid[y][2], grid[y][3])
+			print ('{} {} {} {}'.format(grid[y][0], grid[y][1], grid[y][2], grid[y][3]))
 
-		print ''
+		print ('')
 
 class Node:
 
@@ -65,6 +68,7 @@ class Node:
 			self.pathCost = parent.pathCost + 1
 			self.previousMove = previousMove
 			self.parent = parent
+			print (self.previousMove)
 
 	def getHeuristicEstimate(self, node):
 		heuristic = 0
@@ -142,11 +146,15 @@ class Node:
 	def getPath(self):
 		path = []
 		current = self
-		while current.parent != None:
-			path.append(current.previousMove)
+		print (self.previousMove)
+		print (current.parent.previousMove)
 
-		if(current.parent == None):
+		if current.previousMove is None:
 			path.append('No moves made, already at final state')
+
+		while not current.previousMove is None:
+				path.append(current.previousMove)
+				current = current.parent
 
 		return path
 
