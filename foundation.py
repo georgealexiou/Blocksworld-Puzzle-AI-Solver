@@ -1,3 +1,4 @@
+
 class Block:
 
     """constructor for block class that initializes
@@ -29,22 +30,43 @@ class State:
          agent - blocks that represent the agent in the blocksworld
          immovable - list of immovable blocks
     """
-    def __init__(self, a, b, c, agent, immovables):
-        self.a = a
-        self.b = b
-        self.c = c
+    def __init__(self, movables, agent, immovables):
         self.agent = agent
         self.immovables = immovables
+        self.movables = movables
+        self.gridLength = len(self.movables) + 1
 
     #returns true if the positions of the blocks in a state are the same
     def isEqual(self, state):
-        #check if coordinates of blocks are the same and return true
-        if self.a.isEqual(state.a) and self.b.isEqual(state.b) and self.c.isEqual(state.c):
-            return True
 
-        #otherwise it return false
+        #assume that the coordinates are the same and check if they are not
+        result = True
+        for i in range(0, len(movables) - 1):
+            if not self.movables[i] == state.movables[i]:
+                result = False
+
+        return result
+
+    def isBlocked(self, move):
+        if move == 'U' and self.agent.y == 3:
+            return True
+        elif move == 'D' and self.agent.y == 0:
+            return True
+        elif move == 'R' and self.agent.x == 3:
+            return True
+        elif move == 'L' and self.agent.x == 0:
+            return True
         else:
             return False
+
+    #method that checks if there is an immovable block in the position the agent is trying to move in
+    def isImmovable(self, x, y):
+        if not self.immovables is None:
+            for imm in self.immovables:
+                if imm.x == x and imm.y == y:
+                    return True
+            
+        return False
 
     """prints a 4x4 grid wherethe blocks are represented with the following symbols:
          - - empty block (does not contain any other blocks)
@@ -55,21 +77,24 @@ class State:
          x - immovable block
     """
     def printGrid(self):
-        grid = [['-' for i in range(4)] for i in range(4)]
+        grid = [['-' for i in range(0, self.gridLength)] for i in range(0, self.gridLength)]
 
-        grid[3 - self.a.y][self.a.x] = self.a.name
-        grid[3 - self.b.y][self.b.x] = self.b.name
-        grid[3 - self.c.y][self.c.x] = self.c.name
-        grid[3 - self.agent.y][self.agent.x] = self.agent.name
+        for m in self.movables:
+            grid[self.gridLength - 1 - m.y][m.x] = m.name
+
+        grid[self.gridLength - 1 - self.agent.y][self.agent.x] = self.agent.name
 
         if not self.immovables is None:
-            for x in self.immovables:
-                grid[3 - x.y][x.x] = x.name
+            for immovable in self.immovables:
+                grid[self.gridLength - immovable.y][immovable.x] = immovable.name
 
-        for y in range(0, 4):
-            print ('{} {} {} {}'.format(grid[y][0], grid[y][1], grid[y][2], grid[y][3]))
+        xline = ''
+        for y in range(0, self.gridLength):
+            for x in range(0, self.gridLength):
+                xline = '{} {}'.format(xline, grid[y][x])
 
-        print ('')
+            print (xline)
+            xline = ''
 
 class Node:
 
@@ -92,7 +117,6 @@ class Node:
             self.depth = parent.depth + 1
             self.previousMove = previousMove
             self.parent = parent
-            print (self.previousMove)
 
     #method returns the heuristic cost from the current node to a given node
     def getHeuristicEstimate(self, node):
@@ -110,83 +134,77 @@ class Node:
     #method that determines all possible moves from the current node and returns an list of those moves
     def checkPossibleMoves(self):
         possibleMoves = []
-        if not self.isBlocked('U'):
-            newAgent = Block(self.state.agent.name, self.state.agent.x, self.state.agent.y + 1)
 
-            if not self.isImmovable(newAgent):
-                newState = self.makeMove(newAgent)
-                possibleMoves.append(Node(newState, self, 'U'))
+        if not self.state.isBlocked('U'):
+            didSwap = False
+            if not self.state.isImmovable(self.state.agent.x, self.state.agent.y + 1):
+                uAgent = Block(self.state.agent.name, self.state.agent.x, self.state.agent.y + 1)
+                uMovables = []
+                for m in self.state.movables:
+                    uMovables.append(Block(m.name, m.x, m.y))
 
-        if not self.isBlocked('D'):
-            newAgent = Block(self.state.agent.name, self.state.agent.x, self.state.agent.y - 1)
-            
-            if not self.isImmovable(newAgent):
-                newState = self.makeMove(newAgent)
-                possibleMoves.append(Node(newState, self, 'D'))
+                for i in range(0, len(uMovables)):
+                    if uMovables[i].isEqual(uAgent):
+                        uMovables[i] = Block(uMovables[i].name, self.state.agent.x, self.state.agent.y)
+                        possibleMoves.append(Node(State(uMovables, uAgent, self.state.immovables), self, 'U'))
+                        didSwap = True
 
-        if not self.isBlocked('L'):
-            newAgent = Block(self.state.agent.name, self.state.agent.x - 1, self.state.agent.y)
+                if not didSwap:
+                    possibleMoves.append(Node(State(uMovables, uAgent, self.state.immovables), self, 'U'))
 
-            if not self.isImmovable(newAgent):
-                newState = self.makeMove(newAgent)
-                possibleMoves.append(Node(newState, self, 'L'))
 
-        if not self.isBlocked('R'):
-            newAgent = Block(self.state.agent.name, self.state.agent.x + 1, self.state.agent.y)
+        if not self.state.isBlocked('D'):
+            if not self.state.isImmovable(self.state.agent.x, self.state.agent.y - 1):
+                didSwap = False
+                dAgent = Block(self.state.agent.name, self.state.agent.x, self.state.agent.y - 1)
+                dMovables = []
+                for m in self.state.movables:
+                    dMovables.append(Block(m.name, m.x, m.y))
 
-            if not self.isImmovable(newAgent):
-                newState = self.makeMove(newAgent)
-                possibleMoves.append(Node(newState, self, 'R'))
+                for i in range(0, len(uMovables)):
+                    if dMovables[i].isEqual(dAgent):
+                        dMovables[i] = Block(dMovables[i].name, self.state.agent.x, self.state.agent.y)
+                        possibleMoves.append(Node(State(dMovables, dAgent, self.state.immovables), self, 'D'))
+                        didSwap = True
+
+                if not didSwap:
+                    possibleMoves.append(Node(State(dMovables, dAgent, self.state.immovables), self, 'D'))
+
+        if not self.state.isBlocked('L'):
+            if not self.state.isImmovable(self.state.agent.x - 1, self.state.agent.y):
+                didSwap = False
+                lAgent = Block(self.state.agent.name, self.state.agent.x - 1, self.state.agent.y)
+                lMovables = []
+                for m in self.state.movables:
+                    lMovables.append(Block(m.name, m.x, m.y))
+
+                for i in range(0, len(lMovables)):
+                    if lMovables[i].isEqual(lAgent):
+                        lMovables[i] = Block(lMovables[i].name, self.state.agent.x, self.state.agent.y)
+                        possibleMoves.append(Node(State(lMovables, lAgent, self.state.immovables), self, 'L'))
+                        didSwap = True
+
+                if not didSwap:
+                    possibleMoves.append(Node(State(lMovables, lAgent, self.state.immovables), self, 'L'))
+
+        if not self.state.isBlocked('R'):
+            if not self.state.isImmovable(self.state.agent.x + 1, self.state.agent.y):
+                didSwap = False
+                rAgent = Block(self.state.agent.name, self.state.agent.x + 1, self.state.agent.y)
+                rMovables = []
+                for m in self.state.movables:
+                    rMovables.append(Block(m.name, m.x, m.y))
+
+                for i in range(0, len(lMovables)):
+                    if rMovables[i].isEqual(rAgent):
+                        rMovables[i] = Block(rMovables[i].name, self.state.agent.x, self.state.agent.y)
+                        possibleMoves.append(Node(State(rMovables, rAgent, self.state.immovables), self, 'R'))
+                        didSwap = True
+
+                if not didSwap:
+                    possibleMoves.append(Node(State(rMovables, rAgent, self.state.immovables), self, 'R'))
 
         return possibleMoves
-
-    #method that determines if a move can be performed and returns True if it cant and False if it can
-    def isBlocked(self, move):
-        if move == 'U' and self.state.agent.y == 3:
-            return True
-        elif move == 'D' and self.state.agent.y == 0:
-            return True
-        elif move == 'R' and self.state.agent.x == 3:
-            return True
-        elif move == 'L' and self.state.agent.x == 0:
-            return True
-        else:
-            return False
-
-    #method that checks if there is an immovable block in the position the agent is trying to move in
-    def isImmovable(self, agent):
-        if not self.state.immovables is None:
-            for x in self.state.immovables:
-                if agent.isEqual(x):
-                    return True
-            
-        return False
-        
-    #method that returns a new state based on the position of the new agent from checkPossibleMoves()
-    def makeMove(self, newAgent):
-        if newAgent.isEqual(self.state.a):
-            return State(Block('A', self.state.agent.x, self.state.agent.y),
-                         Block('B', self.state.b.x, self.state.b.y),
-                         Block('C', self.state.c.x, self.state.c.y),
-                         newAgent, self.state.immovables)
-
-        elif newAgent.isEqual(self.state.b):
-            return State(Block('A', self.state.a.x, self.state.a.y),
-                         Block('B', self.state.agent.x, self.state.agent.y),
-                         Block('C', self.state.c.x, self.state.c.y),
-                         newAgent,self.state.immovables)
-
-        elif newAgent.isEqual(self.state.c):
-            return State(Block('A', self.state.a.x, self.state.a.y),
-                         Block('B', self.state.b.x, self.state.b.y),
-                         Block('C', self.state.agent.x, self.state.agent.y),
-                         newAgent, self.state.immovables)
-
-        else:
-            return State(Block('A', self.state.a.x, self.state.a.y),
-                         Block('B', self.state.b.x, self.state.b.y),
-                         Block('C', self.state.c.x, self.state.c.y),
-                         newAgent, self.state.immovables)
 
     #method that returns a list of characters representing the path taken to reach current node
     def getPath(self):
@@ -204,24 +222,26 @@ class Node:
 
         return path
 
-
-
-'''
-HELPER CODE TO TEST FUNCTIONALITY
-
 a = Block('A', 0, 0)
 b = Block('B', 1, 0)
 c = Block('C', 2, 0)
+d = Block('D', 4, 0)
+x = Block('X', 3, 3)
+movables = [a,b,c]
+immovables = [x]
+
+
 agent = Block('P', 3, 0)
-state = State(a, b, c, agent)
+state = State(movables, agent, immovables)
 node = Node(state, None, None)
 
-print 'Start Node:'
+print ('Start Node:')
 node.state.printGrid()
 
-print '\nCheck Moves'
+print ('\nCheck Moves')
 moves = node.checkPossibleMoves()
+
 for move in moves:
-print move.previousMove
-move.state.printGrid()
-'''
+    move.state.printGrid()
+    print ('')
+
