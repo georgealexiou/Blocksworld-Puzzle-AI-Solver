@@ -38,11 +38,10 @@ class State:
 
     #returns true if the positions of the blocks in a state are the same
     def isEqual(self, state):
-
         #assume that the coordinates are the same and check if they are not
         result = True
-        for i in range(0, len(movables) - 1):
-            if not self.movables[i] == state.movables[i]:
+        for i in range(0, len(self.movables) - 1):
+            if not self.movables[i].isEqual(state.movables[i]):
                 result = False
 
         return result
@@ -122,11 +121,10 @@ class Node:
     def getHeuristicEstimate(self, node):
         heuristic = 0
 
-        heuristic += node.state.a.x - self.state.a.x
-        heuristic += node.state.a.y - self.state.a.y
-        heuristic += node.state.b.x - self.state.a.x
-        heuristic += node.state.b.y - self.state.b.y
-        heuristic += node.state.c.y - self.state.c.y
+        for i in range(0, self.state.gridLength - 1):
+            heuristic += abs(self.state.movables[i].x - node.state.movables[i].x) + abs(self.state.movables[i].y - node.state.movables[i].y)
+
+        heuristic += abs(self.state.agent.x - node.state.agent.x) + abs(self.state.agent.y - node.state.agent.y)
         heuristic += self.depth
 
         return heuristic
@@ -161,7 +159,7 @@ class Node:
                 for m in self.state.movables:
                     dMovables.append(Block(m.name, m.x, m.y))
 
-                for i in range(0, len(uMovables)):
+                for i in range(0, len(dMovables)):
                     if dMovables[i].isEqual(dAgent):
                         dMovables[i] = Block(dMovables[i].name, self.state.agent.x, self.state.agent.y)
                         possibleMoves.append(Node(State(dMovables, dAgent, self.state.immovables), self, 'D'))
@@ -195,7 +193,7 @@ class Node:
                 for m in self.state.movables:
                     rMovables.append(Block(m.name, m.x, m.y))
 
-                for i in range(0, len(lMovables)):
+                for i in range(0, len(rMovables)):
                     if rMovables[i].isEqual(rAgent):
                         rMovables[i] = Block(rMovables[i].name, self.state.agent.x, self.state.agent.y)
                         possibleMoves.append(Node(State(rMovables, rAgent, self.state.immovables), self, 'R'))
@@ -222,13 +220,15 @@ class Node:
 
         return path
 
+"""
 a = Block('A', 0, 0)
 b = Block('B', 1, 0)
 c = Block('C', 2, 0)
 d = Block('D', 4, 0)
 x = Block('X', 3, 3)
-movables = [a,b,c]
-immovables = [x]
+x1 = Block('X', 4, 2)
+movables = [a,b,c,d]
+immovables = [x, x1]
 
 
 agent = Block('P', 3, 0)
@@ -244,4 +244,4 @@ moves = node.checkPossibleMoves()
 for move in moves:
     move.state.printGrid()
     print ('')
-
+"""
