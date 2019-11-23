@@ -64,7 +64,7 @@ class SearchMethods:
             print("")
             
             if(currentNode.state.isEqual(self.finishState)):
-                time = timeit.timeit() - startTime
+                time = startTime - timeit.timeit()
                 self.printResults('Depth First', currentNode, visited, time)
                 break
                 
@@ -80,7 +80,40 @@ class SearchMethods:
                         print("")
 
     def iterativeDeepening(self):
-        return 0
+        maxDepth = 0
+
+        startTime = timeit.timeit()
+
+        #initializes stack and dictionary and add Start Node to it
+        s = []
+        s.append(self.startNode)
+
+        visited = {self.startNode: True}
+
+        while len(s) > 0:
+            currentNode = s.pop()
+            print("Visiting:")
+            currentNode.state.printGrid()
+            print("")
+
+            if(currentNode.state.isEqual(self.finishState)):
+                time = startTime - timeit.timeit()
+                self.printResults('Iterative Deepening', currentNode, visited, time)
+                break
+
+            elif currentNode.depth < maxDepth:
+                possibleMoves = currentNode.checkPossibleMoves()
+                shuffle(possibleMoves)
+                print("Expanding...")
+                for nextNode in possibleMoves:
+                    if not possibleMoves is None:
+                        s.append(nextNode)
+                        visited[nextNode] = True
+                        nextNode.state.printGrid()
+                        print("")
+
+
+
 
     def aStar(self):
         path = []
@@ -145,35 +178,7 @@ class PriorityQueue:
     def isEmpty(self):
         if len(self.queue) == 0: return True
         else: return False
-            
 
-movables = []
 
-movables.append(Block('A', 0, 0))
-movables.append(Block('B', 1, 0))
-movables.append(Block('C', 2, 0))
-
-agent = Block('P', 3, 0)
-
-immovables = []
-immovables.append(Block('X', 3, 3))
-
-state = State(movables, agent, None)
-node = Node(state, None, None)
-
-list = node.checkPossibleMoves()
-
-agent1 = Block('P', 3, 3)
-goalMovables = []
-goalMovables.append(Block('A', 1, 2))
-goalMovables.append(Block('B', 0, 1))
-goalMovables.append(Block('C', 1, 0))
-agent1 = Block('P', 3, 3)
-
-state1 = State(goalMovables, agent, None)
-node1 = Node (state1, None, None)
-
-sm = SearchMethods(node, state1)
-sm.aStar()
 
 
