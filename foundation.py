@@ -123,8 +123,10 @@ class Node:
 
         for i in range(0, self.state.gridLength - 1):
             heuristic += abs(self.state.movables[i].x - node.state.movables[i].x) + abs(self.state.movables[i].y - node.state.movables[i].y)
-            
-        heuristic += self.depth
+        
+
+        if not self.parent is None:
+            heuristic = heuristic + self.parent.getHeuristicEstimate(node)
 
         return heuristic
 

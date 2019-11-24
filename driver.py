@@ -6,11 +6,11 @@ from searchMethods import SearchMethods
 
 #Initialize Start Node
 startMovables = []
-startMovables.append(Block('A', 1, 2))
-startMovables.append(Block('B', 1, 1))
-startMovables.append(Block('C', 1, 0))
+startMovables.append(Block('A', 0, 0))
+startMovables.append(Block('B', 1, 0))
+startMovables.append(Block('C', 2, 0))
 
-startAgent = Block('P', 2,1)
+startAgent = Block('P', 3,0)
 startState = State(startMovables, startAgent, None)
 
 startNode = Node(startState, None, None)
@@ -18,7 +18,7 @@ startNode = Node(startState, None, None)
 #Initialize Goal State
 finMovables = []
 finMovables.append(Block('A', 1, 2))
-finMovables.append(Block('B', 2, 1))
+finMovables.append(Block('B', 1, 1))
 finMovables.append(Block('C', 1, 0))
 
 finAgent = Block('P', 3,0)
