@@ -74,10 +74,12 @@ class SearchMethods:
                 print("Expanding...")
                 for nextNode in possibleMoves:
                     if not possibleMoves is None:
+                        print("")
                         s.append(nextNode)
                         visited[nextNode] = True
+                        print('cost: {}'.format(nextNode.getHeuristicEstimate()))
                         nextNode.state.printGrid()
-                        print("")
+                        
 
     def iterativeDeepening(self):
         maxDepth = 0
