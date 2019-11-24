@@ -40,7 +40,7 @@ class State:
     def isEqual(self, state):
         #assume that the coordinates are the same and check if they are not
         result = True
-        for i in range(0, len(self.movables) - 1):
+        for i in range(0, len(self.movables)):
             if not self.movables[i].isEqual(state.movables[i]):
                 result = False
 
@@ -123,8 +123,7 @@ class Node:
 
         for i in range(0, self.state.gridLength - 1):
             heuristic += abs(self.state.movables[i].x - node.state.movables[i].x) + abs(self.state.movables[i].y - node.state.movables[i].y)
-
-        heuristic += abs(self.state.agent.x - node.state.agent.x) + abs(self.state.agent.y - node.state.agent.y)
+            
         heuristic += self.depth
 
         return heuristic
@@ -208,8 +207,6 @@ class Node:
     def getPath(self):
         path = []
         current = self
-        print (self.previousMove)
-        print (current.parent.previousMove)
 
         if current.previousMove is None:
             path.append('No moves made, already at final state')
