@@ -1,4 +1,4 @@
-#Blocksworld tile puzzle - AI Coursework assignment
+# Blocksworld tile puzzle - AI Coursework assignment
 
 An ‘agent’ moves in a simulated NxN grid world with the goal of building towers of blocks. Each grid space
 contains either a ‘tile’ or the agent. Some tiles have letters on them – these are the ‘blocks’. All the other tiles
@@ -7,6 +7,9 @@ that they move onto slides under them into the position that they just came from
 examples of moves are given overleaf. The exact start state and goal state for the assignment is shown below.
 The goal is to build a tower, with these exact blocks in these exact positions as shown. The position of the
 agent at the end doesn’t matter.
+
+
+![startgoal](https://imgur.com/STDFNuW.png)
 
 Implement the following types of search to (try to) solve this problem: depth first, breadth first, iterative
 deepening, A* heuristic search. You might consider randomising the ordering of node expansion in depth first.
@@ -24,3 +27,5 @@ problem (i.e. number of non-white tiles), or the size of the grid world, for exa
 Produce a figure with problem difficulty on the x-axis and number of nodes expanded to find a solution on the
 y-axis, and plot results for all search methods (up to the point when they fail). In some cases it is necessary to
 run the method many times and take an average.
+
+![examples](https://imgur.com/Qym41oo.png)
