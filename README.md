@@ -1,18 +1,31 @@
-# AI Coursework
+# Blocksworld tile puzzle - AI Coursework assignment
 
-You will be given a search problem: details in problem.pdf. The assignment involves implementing the following types of search to solve this problem: depth first, breadth first, iterative deepening, and A* heuristic search. Examine how the time to reach the solution (or a solution of a given quality) increases/scales-up with problem size/difficulty (solution depth).
+An ‘agent’ moves in a simulated NxN grid world with the goal of building towers of blocks. Each grid space
+contains either a ‘tile’ or the agent. Some tiles have letters on them – these are the ‘blocks’. All the other tiles
+are white. The agent moves up/down/left/right (except where borders prevent it). As the agent moves, the tile
+that they move onto slides under them into the position that they just came from (see 8-puzzle)1. Some
+examples of moves are given overleaf. The exact start state and goal state for the assignment is shown below.
+The goal is to build a tower, with these exact blocks in these exact positions as shown. The position of the
+agent at the end doesn’t matter.
 
-Do an approx. six page write-up of your work. (you can exclude example output from the page limit if nec.)
 
-USE THESE HEADINGS:
+![startgoal](https://imgur.com/STDFNuW.png)
 
-   1. Approach (Approx one page: a brief description of your methods/the approach you took; if you had to make any decisions
-      about exactly how to do things/if you did anything unusual, describe these) 
-   2. Evidence of the 4 search methods in operation (include thorough evidence that your 4 methods work using detailed example       output over various scenarios, example solutions found; ie. debugging output that lets you (and me) know they are             working correctly - you can exclude example output from page count if necessary. Make sure you explain what I am looking       at.)
-   3. Scalability study (~one page: describe how you controlled problem difficulty; one plot of your results for the 4 methods
-      with respect to scalability, and brief interpretation of the results and discussion of their significance ->   
-      conclusions)
-   4. Extras and limitations (if you did anything extra, anything beyond what I asked for (eg space complexity,       more
-   difficult version of problem). And limitations / self evaluation i.e. what are the weaknesses of the work you have       done - you can get extra marks for recognising your own weaknesses)
-   5. References (if you used any)
-   6. Code (the code you wrote, in human readable form) - not included in 6 page limit.
+Implement the following types of search to (try to) solve this problem: depth first, breadth first, iterative
+deepening, A* heuristic search. You might consider randomising the ordering of node expansion in depth first.
+Provide evidence of these methods running/the solutions (action sequences) that they find - provide the
+shortest action sequence for each method (assuming it completes), from the start state to the goal. Not all
+methods will necessarily be able to solve this problem – you might experiment with making it easier – e.g. by
+making the start state closer to the goal state. (If you alter the start state, say what it is when you provide your
+solutions).
+
+Then examine how the computational time (number of nodes expanded) to reach a solution increases/scalesup
+with problem size/difficulty. You might control problem difficulty by controlling the depth of the solution
+(i.e. how far the start state is from the goal state - recommended), or by altering the number of blocks in the
+problem (i.e. number of non-white tiles), or the size of the grid world, for example.
+
+Produce a figure with problem difficulty on the x-axis and number of nodes expanded to find a solution on the
+y-axis, and plot results for all search methods (up to the point when they fail). In some cases it is necessary to
+run the method many times and take an average.
+
+![examples](https://imgur.com/Qym41oo.png)
