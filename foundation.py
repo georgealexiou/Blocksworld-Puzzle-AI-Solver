@@ -36,7 +36,7 @@ class State:
         self.movables = movables
         self.gridLength = len(self.movables) + 1
 
-    #returns true if the positions of the blocks in a state are the same
+    #method that returns true if the positions of the blocks in a state are the same
     def isEqual(self, state):
         #assume that the coordinates are the same and check if they are not
         result = True
@@ -45,7 +45,8 @@ class State:
                 result = False
 
         return result
-
+    
+    #method that returns True if a given move cannot be performed
     def isBlocked(self, move):
         if move == 'U' and self.agent.y == 3:
             return True
@@ -76,17 +77,22 @@ class State:
          x - immovable block
     """
     def printGrid(self):
+        #generate empty grid
         grid = [['-' for i in range(0, self.gridLength)] for i in range(0, self.gridLength)]
 
+        #add movable blocks to the grid
         for m in self.movables:
             grid[self.gridLength - 1 - m.y][m.x] = m.name
 
+        #add agent to the grid
         grid[self.gridLength - 1 - self.agent.y][self.agent.x] = self.agent.name
 
+        #checks if there are immovable blocks and adds them to the grid if they exist
         if not self.immovables is None:
             for immovable in self.immovables:
                 grid[self.gridLength - immovable.y][immovable.x] = immovable.name
 
+        #prints grid
         xline = ''
         for y in range(0, self.gridLength):
             for x in range(0, self.gridLength):
@@ -121,27 +127,41 @@ class Node:
     def getHeuristicEstimate(self, node):
         heuristic = 0
 
+        #calculte Manhattan distance for each node
         for i in range(0, self.state.gridLength - 1):
             heuristic += abs(self.state.movables[i].x - node.state.movables[i].x) + abs(self.state.movables[i].y - node.state.movables[i].y)
         
-
         if not self.parent is None:
             heuristic = heuristic + self.parent.getHeuristicEstimate(node)
-
+            
         return heuristic
 
-    #method that determines all possible moves from the current node and returns an list of those moves
+    """
+    Method that determines all possible moves from the current node and returns an list of those moves
+    The order the moves are checked in and added to the list are:
+        1. UP
+        2. DOWN
+        3. LEFT
+        4. RIGHT
+    """
     def checkPossibleMoves(self):
         possibleMoves = []
 
+        #create new Node for the move 'UP'
         if not self.state.isBlocked('U'):
-            didSwap = False
+        
+            #check if there is an immovable object in the position the agent is trying to move in
             if not self.state.isImmovable(self.state.agent.x, self.state.agent.y + 1):
+                didSwap = False
+                
+                #creates new agent and movables array
                 uAgent = Block(self.state.agent.name, self.state.agent.x, self.state.agent.y + 1)
                 uMovables = []
+                
                 for m in self.state.movables:
                     uMovables.append(Block(m.name, m.x, m.y))
 
+                #ckecks if a movable block is swapped with the agent
                 for i in range(0, len(uMovables)):
                     if uMovables[i].isEqual(uAgent):
                         uMovables[i] = Block(uMovables[i].name, self.state.agent.x, self.state.agent.y)
@@ -153,13 +173,19 @@ class Node:
 
 
         if not self.state.isBlocked('D'):
+        
+            #check if there is an immovable object in the position the agent is trying to move in
             if not self.state.isImmovable(self.state.agent.x, self.state.agent.y - 1):
                 didSwap = False
+                
+                #creates new agent and movables array
                 dAgent = Block(self.state.agent.name, self.state.agent.x, self.state.agent.y - 1)
                 dMovables = []
+                
                 for m in self.state.movables:
                     dMovables.append(Block(m.name, m.x, m.y))
-
+        
+                #ckecks if a movable block is swapped with the agent
                 for i in range(0, len(dMovables)):
                     if dMovables[i].isEqual(dAgent):
                         dMovables[i] = Block(dMovables[i].name, self.state.agent.x, self.state.agent.y)
@@ -170,13 +196,19 @@ class Node:
                     possibleMoves.append(Node(State(dMovables, dAgent, self.state.immovables), self, 'D'))
 
         if not self.state.isBlocked('L'):
+
+            #check if there is an immovable object in the position the agent is trying to move in
             if not self.state.isImmovable(self.state.agent.x - 1, self.state.agent.y):
                 didSwap = False
+                
+                #creates new agent and movables array
                 lAgent = Block(self.state.agent.name, self.state.agent.x - 1, self.state.agent.y)
                 lMovables = []
+                
                 for m in self.state.movables:
                     lMovables.append(Block(m.name, m.x, m.y))
-
+                    
+                #ckecks if a movable block is swapped with the agent
                 for i in range(0, len(lMovables)):
                     if lMovables[i].isEqual(lAgent):
                         lMovables[i] = Block(lMovables[i].name, self.state.agent.x, self.state.agent.y)
@@ -187,13 +219,19 @@ class Node:
                     possibleMoves.append(Node(State(lMovables, lAgent, self.state.immovables), self, 'L'))
 
         if not self.state.isBlocked('R'):
+        
+            #check if there is an immovable object in the position the agent is trying to move in
             if not self.state.isImmovable(self.state.agent.x + 1, self.state.agent.y):
                 didSwap = False
+                
+                #creates new agent and movables array
                 rAgent = Block(self.state.agent.name, self.state.agent.x + 1, self.state.agent.y)
                 rMovables = []
+                
                 for m in self.state.movables:
                     rMovables.append(Block(m.name, m.x, m.y))
 
+                #ckecks if a movable block is swapped with the agent
                 for i in range(0, len(rMovables)):
                     if rMovables[i].isEqual(rAgent):
                         rMovables[i] = Block(rMovables[i].name, self.state.agent.x, self.state.agent.y)
@@ -218,29 +256,3 @@ class Node:
                 current = current.parent
 
         return path
-
-"""
-a = Block('A', 0, 0)
-b = Block('B', 1, 0)
-c = Block('C', 2, 0)
-d = Block('D', 4, 0)
-x = Block('X', 3, 3)
-x1 = Block('X', 4, 2)
-movables = [a,b,c,d]
-immovables = [x, x1]
-
-
-agent = Block('P', 3, 0)
-state = State(movables, agent, immovables)
-node = Node(state, None, None)
-
-print ('Start Node:')
-node.state.printGrid()
-
-print ('\nCheck Moves')
-moves = node.checkPossibleMoves()
-
-for move in moves:
-    move.state.printGrid()
-    print ('')
-"""
