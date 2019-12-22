@@ -133,7 +133,7 @@ class SearchMethods:
             #otherwise if stack is empty we increment maxDepth by 1
             #and add the currentNode to the stack
             if not s:
-                s.append(self.currentNode)
+                s.append(currentNode)
                 maxDepth = maxDepth + 1
 
     #method that performs A* Search to find a solution in our search tree
@@ -216,3 +216,4 @@ class PriorityQueue():
     #method that returns true if the list is empty
     def isEmpty(self):
         return len(self.pq) == 0
+

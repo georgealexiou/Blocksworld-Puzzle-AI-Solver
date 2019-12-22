@@ -136,6 +136,7 @@ class Node:
             
         return heuristic
 
+
     """
     Method that determines all possible moves from the current node and returns an list of those moves
     The order the moves are checked in and added to the list are:
