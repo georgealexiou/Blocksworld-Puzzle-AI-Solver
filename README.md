@@ -29,3 +29,5 @@ y-axis, and plot results for all search methods (up to the point when they fail)
 run the method many times and take an average.
 
 ![examples](https://imgur.com/Qym41oo.png)
+
+The above coursework description in this README.md file was provided by the University of Southampton's Electronics and Computer Science (ECS) Department.
